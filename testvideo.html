@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cinematic Player</title>
+    <style>
+        body {
+            background: #0d0d0d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .player-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.25);
+            background: black;
+        }
+
+        #player {
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            gap: 8px;
+            z-index: 10;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(0px);
+            background: rgba(0, 0, 0, 0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .controls.active {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 0, 0, 0.5);
+        }
+
+        .progress-container {
+            flex: 1 1 auto;
+            min-width: 80px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            touch-action: none;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: #ff0000;
+            border-radius: 3px;
+        }
+
+        /* 🌐 Mobile View */
+        @media (max-width: 768px) {
+            body {
+                background: black;
+                margin: 0;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .player-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                z-index: 1;
+            }
+
+            #player {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: 0;
+            }
+
+            .controls {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px 12px;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+                opacity: 1;
+                transition: opacity 0.4s ease;
+                z-index: 10;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .controls.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .control-btn {
+                font-size: 18px;
+                padding: 8px 10px;
+                border-radius: 6px;
+                flex-shrink: 0;
+            }
+
+            .progress-container {
+                position: fixed;
+                bottom: 60px;
+                left: 12px;
+                right: 12px;
+                width: auto;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.25);
+                cursor: pointer;
+                z-index: 15;
+                border-radius: 3px;
+            }
+
+            .progress {
+                height: 100%;
+                width: 0%;
+                background: #ff0000;
+                border-radius: 3px;
+            }
+
+            /* Gesture areas */
+            .tap-zone {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 50%;
+                z-index: 5;
+            }
+
+            .tap-left {
+                left: 0;
+            }
+
+            .tap-right {
+                right: 0;
+            }
+
+            .feedback {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 28px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+                z-index: 20;
+            }
+
+            .feedback.show {
+                opacity: 1;
+            }
+
+            .feedback.left {
+                left: 25%;
+            }
+
+            .feedback.right {
+                right: 25%;
+            }
+        }
+
+        /* Center feedback (play/pause) */
+        .center-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            opacity: 0;
+            color: white;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .center-feedback.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="player-container">
+        <div id="player"></div>
+
+        <!-- Gesture zones -->
+        <div class="tap-zone tap-left"></div>
+        <div class="tap-zone tap-right"></div>
+        <div class="feedback left" id="leftFeedback">⏪ -10s</div>
+        <div class="feedback right" id="rightFeedback">⏩ +10s</div>
+        <div class="center-feedback" id="centerFeedback">▶</div>
+
+        <div class="controls" id="controls">
+            <button id="playPauseBtn" class="control-btn">▶</button>
+            <button id="skipBackBtn" class="control-btn">⏪ -10s</button>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress" id="progress"></div>
+            </div>
+            <button id="skipForwardBtn" class="control-btn">⏩ +10s</button>
+            <button id="muteBtn" class="control-btn">🔇</button>
+            <button id="fullscreenBtn" class="control-btn">⛶</button>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player, progressInterval, hideControlsTimeout;
+        let lastTapLeft = 0, lastTapRight = 0, lastClickTime = 0;
+        let isDragging = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'K5KVEU3aaeQ',
+                playerVars: { modestbranding: 1, rel: 0, showinfo: 0, controls: 0, disablekb: 1 },
+                events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange },
+            });
+        }
+
+        function onPlayerReady() {
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const skipBackBtn = document.getElementById('skipBackBtn');
+            const skipForwardBtn = document.getElementById('skipForwardBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const progress = document.getElementById('progress');
+            const progressContainer = document.getElementById('progressContainer');
+            const controls = document.getElementById('controls');
+            const leftZone = document.querySelector('.tap-left');
+            const rightZone = document.querySelector('.tap-right');
+            const leftFeedback = document.getElementById('leftFeedback');
+            const rightFeedback = document.getElementById('rightFeedback');
+            const centerFeedback = document.getElementById('centerFeedback');
+            const playerContainer = document.querySelector('.player-container');
+
+            function togglePlayPause() {
+                const state = player.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+                else player.playVideo();
+            }
+
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            skipBackBtn.addEventListener('click', () => seekRelative(-10));
+            skipForwardBtn.addEventListener('click', () => seekRelative(10));
+
+            muteBtn.addEventListener('click', () => {
+                if (player.isMuted()) {
+                    player.unMute();
+                    muteBtn.textContent = '🔇';
+                } else {
+                    player.mute();
+                    muteBtn.textContent = '🔊';
+                }
+            });
+
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            document.addEventListener('fullscreenchange', updateFullscreenBtn);
+
+            function updateProgress(e) {
+                const rect = progressContainer.getBoundingClientRect();
+                let clientX;
+                if (e.type.startsWith('touch')) clientX = e.touches[0].clientX;
+                else clientX = e.clientX;
+                const percent = (clientX - rect.left) / rect.width;
+                player.seekTo(player.getDuration() * Math.min(Math.max(percent, 0), 1), true);
+            }
+
+            // Desktop & Mobile progress dragging
+            progressContainer.addEventListener('mousedown', e => { isDragging = true; updateProgress(e); });
+            progressContainer.addEventListener('mousemove', e => { if (isDragging) updateProgress(e); });
+            progressContainer.addEventListener('mouseup', e => { if (isDragging) { updateProgress(e); isDragging = false; } });
+            progressContainer.addEventListener('mouseleave', () => { isDragging = false; });
+            progressContainer.addEventListener('touchstart', e => { isDragging = true; updateProgress(e); });
+            progressContainer.addEventListener('touchmove', e => { if (isDragging) updateProgress(e); });
+            progressContainer.addEventListener('touchend', e => { if (isDragging) { isDragging = false; } });
+
+            progressInterval = setInterval(() => {
+                if (player && player.getDuration) {
+                    const percent = (player.getCurrentTime() / player.getDuration()) * 100;
+                    progress.style.width = percent + '%';
+                }
+            }, 500);
+
+            document.addEventListener('keydown', e => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlayPause();
+                    showCenterFeedback();
+                }
+                else if (e.code === 'ArrowRight') {
+                    e.preventDefault();
+                    seekRelative(10);
+                    showFeedback(rightFeedback);
+                }
+                else if (e.code === 'ArrowLeft') {
+                    e.preventDefault();
+                    seekRelative(-10);
+                    showFeedback(leftFeedback);
+                }
+            });
+            document.addEventListener('mousemove', showControls);
+
+            playerContainer.addEventListener('click', e => {
+                if (e.target.closest('.controls')) return;
+                const now = Date.now();
+                const rect = playerContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = rect.width;
+                if (now - lastClickTime < 300) {
+                    if (x < width * 0.33) { seekRelative(-10); showFeedback(leftFeedback); }
+                    else if (x > width * 0.66) { seekRelative(10); showFeedback(rightFeedback); }
+                } else { togglePlayPause(); showCenterFeedback(); }
+                lastClickTime = now;
+            });
+
+            leftZone.addEventListener('touchend', () => handleDoubleTap('left'));
+            rightZone.addEventListener('touchend', () => handleDoubleTap('right'));
+
+            function handleDoubleTap(side) {
+                const now = Date.now();
+                if (side === 'left' && now - lastTapLeft < 300) { seekRelative(-10); showFeedback(leftFeedback); }
+                else if (side === 'right' && now - lastTapRight < 300) { seekRelative(10); showFeedback(rightFeedback); }
+                if (side === 'left') lastTapLeft = now; else lastTapRight = now;
+            }
+
+            function showFeedback(el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 500); }
+            function showCenterFeedback() {
+                const state = player.getPlayerState();
+                centerFeedback.textContent = state === YT.PlayerState.PLAYING ? '⏸' : '▶';
+                centerFeedback.classList.add('show');
+                setTimeout(() => centerFeedback.classList.remove('show'), 400);
+            }
+            function seekRelative(sec) { const c = player.getCurrentTime(), d = player.getDuration(); player.seekTo(Math.min(Math.max(c + sec, 0), d), true); }
+            function toggleFullscreen() { const container = document.querySelector('.player-container'); if (!document.fullscreenElement) container.requestFullscreen(); else document.exitFullscreen(); }
+            function updateFullscreenBtn() { fullscreenBtn.textContent = document.fullscreenElement ? '❎' : '⛶'; }
+            function showControls() { controls.style.opacity = '1'; controls.style.pointerEvents = 'auto'; clearTimeout(hideControlsTimeout); hideControlsTimeout = setTimeout(() => { if (player.getPlayerState() === YT.PlayerState.PLAYING) { controls.style.opacity = '0'; controls.style.pointerEvents = 'none'; } }, 2000); }
+            showControls();
+        }
+
+        function onPlayerStateChange(event) {
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const controls = document.getElementById('controls');
+            if (event.data === YT.PlayerState.PLAYING) { playPauseBtn.textContent = '⏸'; controls.classList.remove('active'); }
+            else { playPauseBtn.textContent = '▶'; controls.classList.add('active'); }
+        }
+    </script>
+</body>
+
+</html>

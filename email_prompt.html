@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email/Phone Prompt</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .result p {
+            color: #333;
+            margin: 0;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Access Verification</h1>
+        <p>Please enter your credentials to access the video player</p>
+        <button class="btn" onclick="showPrompt()">Enter Credentials</button>
+        
+        <div class="result" id="result">
+            <h3>✅ Access Granted!</h3>
+            <p id="resultText"></p>
+        </div>
+    </div>
+
+    <script>
+        // Allowed credentials (whitelist)
+        const allowedCredentials = {
+            emails: [
+                'demo@example.com',
+                'test@gmail.com',
+                'user@maktoob.com'
+            ],
+            phones: [
+                '9876543210',
+                '8765432109',
+                '7654321098'
+            ]
+        };
+
+        async function showPrompt() {
+            const { value: contact } = await Swal.fire({
+                title: 'Verify Your Credentials',
+                html: `
+                    <input type="text" id="contact" class="swal2-input" placeholder="Enter Email or Phone Number">
+                    <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+                        <p style="font-size: 0.85rem; color: #667eea; font-weight: 600; margin-bottom: 8px;">
+                            🔑 Test Credentials:
+                        </p>
+                        <p style="font-size: 0.8rem; color: #666; margin: 4px 0;">
+                            📧 Email: <code style="background: #e9ecef; padding: 2px 6px; border-radius: 4px;">demo@example.com</code>
+                        </p>
+                        <p style="font-size: 0.8rem; color: #666; margin: 4px 0;">
+                            📱 Phone: <code style="background: #e9ecef; padding: 2px 6px; border-radius: 4px;">9876543210</code>
+                        </p>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#667eea',
+                cancelButtonColor: '#d33',
+                preConfirm: () => {
+                    const contactValue = document.getElementById('contact').value.trim();
+                    
+                    if (!contactValue) {
+                        Swal.showValidationMessage('Please enter your credentials');
+                        return false;
+                    }
+                    
+                    // Check if it contains @ (likely email)
+                    if (contactValue.includes('@')) {
+                        // Validate as email
+                        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                        if (!emailRegex.test(contactValue)) {
+                            Swal.showValidationMessage('Please enter a valid email address (e.g., user@example.com)');
+                            return false;
+                        }
+                        return { type: 'email', value: contactValue };
+                    } else {
+                        // Validate as Indian mobile number
+                        // Remove all non-digit characters for validation
+                        const digitsOnly = contactValue.replace(/\D/g, '');
+                        
+                        // Indian mobile number validation
+                        // Format: 10 digits starting with 6, 7, 8, or 9
+                        // OR with country code: +91 followed by 10 digits
+                        const indianMobileRegex = /^[6-9]\d{9}$/; // 10 digits starting with 6-9
+                        const indianMobileWithCodeRegex = /^(\+91|91)?[6-9]\d{9}$/; // With optional +91 or 91
+                        
+                        if (!indianMobileWithCodeRegex.test(digitsOnly)) {
+                            Swal.showValidationMessage('Please enter a valid Indian mobile number (10 digits starting with 6, 7, 8, or 9)');
+                            return false;
+                        }
+                        
+                        // Check if original input contains valid phone characters
+                        const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+                        if (!phoneRegex.test(contactValue)) {
+                            Swal.showValidationMessage('Phone number can only contain digits, spaces, +, -, ( )');
+                            return false;
+                        }
+                        
+                        return { type: 'phone', value: contactValue };
+                    }
+                },
+                customClass: {
+                    popup: 'animated-popup'
+                }
+            });
+
+            if (contact) {
+                // Check if credentials are in the allowed list
+                let isAllowed = false;
+                
+                if (contact.type === 'email') {
+                    isAllowed = allowedCredentials.emails.includes(contact.value.toLowerCase());
+                } else if (contact.type === 'phone') {
+                    // Remove all non-digits for comparison
+                    const digitsOnly = contact.value.replace(/\D/g, '');
+                    // Check with or without country code
+                    const phoneWithoutCode = digitsOnly.replace(/^(91|\+91)/, '');
+                    isAllowed = allowedCredentials.phones.includes(phoneWithoutCode);
+                }
+
+                if (!isAllowed) {
+                    // Show error for invalid credentials
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Access Denied',
+                        html: `
+                            <p style="color: #d33; font-weight: 600;">Invalid Credentials</p>
+                            <p style="margin-top: 1rem; color: #666;">
+                                The ${contact.type === 'email' ? 'email' : 'phone number'} you entered is not authorized.
+                            </p>
+                            <p style="margin-top: 1rem; font-size: 0.9rem; color: #999;">
+                                Please contact support for access.
+                            </p>
+                        `,
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Try Again'
+                    });
+                    return;
+                }
+
+                const contactType = contact.type === 'email' ? '📧 Email' : '📱 Phone';
+                
+                // Show success message
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Verified Successfully!',
+                    html: `
+                        <p>Your ${contactType} has been verified:</p>
+                        <p style="font-weight: 600; color: #667eea; font-size: 1.1rem;">${contact.value}</p>
+                        <p style="margin-top: 1rem; color: #666;">Redirecting to video player...</p>
+                    `,
+                    confirmButtonColor: '#667eea',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+
+                // Save contact to localStorage
+                localStorage.setItem('userContact', JSON.stringify({
+                    type: contact.type,
+                    value: contact.value,
+                    timestamp: new Date().toISOString()
+                }));
+
+                // Log for debugging
+                console.log('Contact verified:', {
+                    type: contact.type,
+                    value: contact.value
+                });
+
+                // Redirect to testvideo.html after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'testvideo.html';
+                }, 2000);
+            }
+        }
+
+        // Optional: Show prompt automatically on page load
+        // window.addEventListener('load', () => {
+        //     setTimeout(showPrompt, 1000);
+        // });
+    </script>
+</body>
+</html>
