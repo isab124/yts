@@ -253,6 +253,12 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        // Check if user is authorized
+        if (localStorage.getItem('userAuthorized') !== 'true') {
+            // Redirect to email prompt if not authorized
+            window.location.href = 'email_prompt.html';
+        }
+
         let player, progressInterval, hideControlsTimeout;
         let lastTapLeft = 0, lastTapRight = 0, lastClickTime = 0;
         let isDragging = false;

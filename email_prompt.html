@@ -99,6 +99,12 @@
     </div>
 
     <script>
+        // Check if user is already authorized
+        if (localStorage.getItem('userAuthorized') === 'true') {
+            // Redirect to video player if already authorized
+            window.location.href = 'testvideo.html';
+        }
+
         // Allowed credentials (whitelist)
         const allowedCredentials = {
             emails: [
@@ -241,6 +247,9 @@
                     value: contact.value,
                     timestamp: new Date().toISOString()
                 }));
+
+                // Store user as authorized
+                localStorage.setItem('userAuthorized', 'true');
 
                 // Log for debugging
                 console.log('Contact verified:', {
