@@ -50,6 +50,8 @@
             transform: translateX(-1px);
         }
 
+
+
         .player-container {
             position: relative;
             width: 90%;
@@ -280,6 +282,8 @@
                 border-radius: 4px;
                 backdrop-filter: blur(5px);
             }
+
+
         }
 
         /* Center feedback (play/pause) */
@@ -332,19 +336,185 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        // Anti-debugging: Detect DevTools and redirect immediately
+        (function () {
+            const devtools = { isOpen: false, detected: false };
+            const threshold = 160;
+            let detectionCount = 0;
+
+            setInterval(function () {
+                const widthDiff = window.outerWidth - window.innerWidth;
+                const heightDiff = window.outerHeight - window.innerHeight;
+
+                if (widthDiff > threshold || heightDiff > threshold) {
+                    devtools.isOpen = true;
+                    detectionCount++;
+
+                    // Redirect after 2 consecutive detections (1 second) to avoid false positives
+                    if (detectionCount >= 2 && !devtools.detected) {
+                        devtools.detected = true;
+                        console.warn('Developer tools detected - Redirecting...');
+
+                        // Log the attempt
+                        const userInfo = localStorage.getItem('userContact');
+                        if (userInfo) {
+                            console.log('DevTools opened by:', JSON.parse(userInfo).value);
+                        }
+
+                        // Redirect to video list
+                        window.location.href = 'youtube_subscription_site.html';
+                    }
+                } else {
+                    devtools.isOpen = false;
+                    // Reset counter if DevTools closed
+                    if (detectionCount > 0) {
+                        detectionCount = Math.max(0, detectionCount - 1);
+                    }
+                }
+            }, 500); // Check every 500ms for faster detection
+
+            window.devtools = devtools;
+        })();
+
         // Check if user is authorized
         if (localStorage.getItem('userAuthorized') !== 'true') {
             // Redirect to email prompt if not authorized
             window.location.href = 'index.html';
         }
 
+        // Additional DevTools detection using debugger
+        (function () {
+            let checkCount = 0;
+            setInterval(function () {
+                const before = new Date();
+                debugger; // This pauses if DevTools is open
+                const after = new Date();
+                const diff = after - before;
+
+                // If debugger paused for more than 100ms, DevTools is open
+                if (diff > 100) {
+                    checkCount++;
+                    if (checkCount >= 2) {
+                        console.warn('DevTools detected via debugger - Redirecting...');
+                        window.location.href = 'youtube_subscription_site.html';
+                    }
+                } else {
+                    checkCount = 0;
+                }
+            }, 1000);
+        })();
+
+        // Prevent right-click and inspect shortcuts
+        document.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            // Show custom message
+            alert('Right-click is disabled for content protection');
+            return false;
+        });
+
+        document.addEventListener('keydown', e => {
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C, Ctrl+Shift+K
+            if (e.keyCode === 123 || // F12
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+                (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+                (e.ctrlKey && e.shiftKey && e.keyCode === 67) || // Ctrl+Shift+C
+                (e.ctrlKey && e.shiftKey && e.keyCode === 75) || // Ctrl+Shift+K (Firefox)
+                (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+                (e.ctrlKey && e.keyCode === 83) || // Ctrl+S (Save)
+                e.keyCode === 123) { // F12
+                e.preventDefault();
+                alert('This action is disabled for content protection');
+                return false;
+            }
+        });
+
+        // Detect DevTools via console object manipulation
+        (function () {
+            const element = new Image();
+            Object.defineProperty(element, 'id', {
+                get: function () {
+                    // This getter is called when DevTools tries to log the element
+                    console.warn('Console access detected - Redirecting...');
+                    window.location.href = 'youtube_subscription_site.html';
+                }
+            });
+            // Try to log it (will trigger if console is open)
+            console.log('%c', element);
+        })();
+
         let player, progressInterval, hideControlsTimeout;
         let lastTapLeft = 0, lastTapRight = 0, lastClickTime = 0;
         let isDragging = false;
 
+        // Obfuscation Layer 1: Split and encoded video data
+        // Original: K5KVEU3aaeQ
+        const _0x4a2b = ['K5KV', 'EU3a', 'aeQ'];
+
+        // Obfuscation Layer 2: Decode function with anti-debugging
+        function _0xd3c0(parts) {
+            const _t = Date.now();
+            if (window.devtools && window.devtools.isOpen) return null;
+            // Join the parts to form video ID
+            const decoded = parts.join('');
+            return (_t % 2 === 0) ? decoded : decoded;
+        }
+
+        // Obfuscation Layer 3: Get video ID with domain check
+        function _0x9f2a() {
+            // Check if running on allowed domain (prevents embedding)
+            const allowedDomains = ['127.0.0.1', 'localhost'];
+            const currentDomain = window.location.hostname;
+
+            console.log('Current domain:', currentDomain);
+
+            // Domain verification (allow empty for local file testing)
+            const isDomainAllowed = allowedDomains.some(domain =>
+                currentDomain.includes(domain)
+            ) || currentDomain === '';
+
+            if (!isDomainAllowed) {
+                console.error('Unauthorized domain:', currentDomain);
+                return null;
+            }
+
+            // Get user info for watermarking
+            const userInfo = localStorage.getItem('userContact');
+            if (!userInfo) {
+                console.error('No user info found');
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            // Decode video ID
+            const vid = _0xd3c0(_0x4a2b);
+            console.log('Decoded video ID:', vid);
+
+            // Log access (in production, send to backend)
+            const accessLog = {
+                user: JSON.parse(userInfo).value,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: document.referrer
+            };
+            console.log('Access logged:', accessLog);
+
+            return vid;
+        }
+
         function onYouTubeIframeAPIReady() {
+            const videoId = _0x9f2a();
+
+            console.log('Video ID retrieved:', videoId);
+            console.log('Video ID length:', videoId ? videoId.length : 0);
+
+            if (!videoId) {
+                alert('Unauthorized access detected');
+                window.location.href = 'index.html';
+                return;
+            }
+
             player = new YT.Player('player', {
-                videoId: 'K5KVEU3aaeQ',
+                videoId: videoId,
                 playerVars: { modestbranding: 1, rel: 0, showinfo: 0, controls: 0, disablekb: 1 },
                 events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange },
             });
