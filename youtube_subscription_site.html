@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Content Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Login Page */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-box {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 1px rgba(148, 163, 184, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .login-box h1 {
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            background: rgba(15, 23, 42, 0.5);
+            color: #f1f5f9;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1),
+                inset 0 0 10px rgba(99, 102, 241, 0.05);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3),
+                0 0 1px rgba(255, 255, 255, 0.3) inset;
+            letter-spacing: 0.5px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4),
+                0 0 1px rgba(255, 255, 255, 0.3) inset;
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .demo-credentials {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #cbd5e1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-credentials strong {
+            display: block;
+            color: #a5b4fc;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .demo-credentials code {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #fbbf24;
+            margin-left: 4px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .error-message {
+            color: #fca5a5;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            padding: 12px 14px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            display: none;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .success-message {
+            color: #86efac;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            padding: 12px 14px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            display: none;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: block;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subscription-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .status-badge.expiring {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .status-badge.expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .days-remaining {
+            color: #a5b4fc;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .playlist-header {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            padding: 32px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .playlist-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .playlist-stats {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Videos List */
+        .videos-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 32px;
+            background: transparent;
+        }
+
+        .video-card {
+            display: flex;
+            gap: 20px;
+            padding: 28px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .video-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 2px;
+        }
+
+        .video-card:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(167, 139, 250, 0.6);
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 40px rgba(99, 102, 241, 0.25);
+            transform: translateY(-6px);
+        }
+
+        .video-thumbnail {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3),
+                0 0 1px rgba(255, 255, 255, 0.2) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .video-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .video-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .video-card:hover .video-title {
+            color: #a5b4fc;
+        }
+
+        .video-description {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .watch-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            width: fit-content;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .watch-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s;
+            padding: 20px;
+        }
+
+        .modal[style*="display: block"] {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            margin: 0;
+            padding: 0;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 1400px;
+            max-height: calc(100vh - 40px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(99, 102, 241, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.3s;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        .video-player-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+        }
+
+        .video-player-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            font-size: 24px;
+            font-weight: bold;
+            color: #cbd5e1;
+            cursor: pointer;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(30, 41, 59, 0.5);
+            transition: all 0.3s ease;
+            padding: 0;
+            line-height: 1;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .close-btn:hover {
+            color: #f1f5f9;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
+        .modal h2 {
+            color: #f1f5f9;
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-description {
+            color: #cbd5e1;
+            line-height: 1.7;
+            padding: 24px 28px;
+            font-size: 14px;
+            border-top: 1px solid rgba(99, 102, 241, 0.15);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%);
+        }
+
+        @media (max-width: 768px) {
+            .video-card {
+                padding: 20px;
+                gap: 14px;
+            }
+
+            .videos-grid {
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .video-thumbnail {
+                width: 90px;
+                height: 90px;
+                font-size: 36px;
+            }
+
+            .video-title {
+                font-size: 14px;
+            }
+
+            .video-description {
+                font-size: 12px;
+            }
+
+            .navbar-content {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .subscription-info {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .playlist-header {
+                padding: 20px;
+            }
+
+            .login-box {
+                padding: 40px 30px;
+            }
+
+            .modal {
+                padding: 10px;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-height: calc(100vh - 20px);
+                border-radius: 16px;
+                border-width: 1.5px;
+            }
+
+            .modal-header {
+                padding: 14px 18px;
+            }
+
+            .modal h2 {
+                font-size: 16px;
+                line-height: 1.3;
+            }
+
+            .modal-description {
+                padding: 16px 20px;
+                font-size: 13px;
+            }
+
+            .close-btn {
+                font-size: 22px;
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-card {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .videos-grid {
+                gap: 14px;
+                padding: 16px;
+            }
+
+            .video-thumbnail {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+
+            .playlist-title {
+                font-size: 20px;
+            }
+
+            .video-title {
+                font-size: 13px;
+            }
+
+            .video-description {
+                font-size: 11px;
+            }
+
+            .login-box h1 {
+                font-size: 24px;
+            }
+
+            .modal {
+                padding: 8px;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-height: calc(100vh - 16px);
+                border-radius: 12px;
+                border-width: 1px;
+            }
+
+            .modal-header {
+                padding: 12px 14px;
+            }
+
+            .modal h2 {
+                font-size: 14px;
+                line-height: 1.3;
+            }
+
+            .modal-description {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+
+            .close-btn {
+                font-size: 20px;
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="navbar">
+            <div class="navbar-content">
+                <h2>Premium Content Hub</h2>
+                <div class="subscription-info">
+                    <span class="status-badge active" id="statusBadge">Active</span>
+                    <span class="days-remaining" id="daysRemaining">30 days left</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="playlist-header">
+                <div class="playlist-title">Exclusive Tutorials & Guides</div>
+                <div class="playlist-stats" id="playlistStats">6 videos</div>
+            </div>
+
+            <div class="videos-grid" id="videosList">
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="video-player-container" id="videoPlayerContainer"></div>
+            </div>
+            <p class="modal-description" id="modalDescription"></p>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is authorized
+        if (localStorage.getItem('userAuthorized') !== 'true') {
+            // Redirect to email prompt if not authorized
+            window.location.href = 'index.html';
+        }
+
+        const videos = [
+            {
+                id: 1,
+                title: "Getting Started with Web Development",
+                description: "Learn the fundamentals of HTML, CSS, and JavaScript in this comprehensive tutorial for beginners.",
+                url: "testvideo.html",
+                icon: "🎬"
+            },
+            {
+                id: 2,
+                title: "Advanced JavaScript Techniques & Patterns",
+                description: "Master async/await, closures, and functional programming patterns to write better code.",
+                url: "testvideo.html",
+                icon: "📝"
+            },
+            {
+                id: 3,
+                title: "Building Responsive Websites",
+                description: "Create beautiful and responsive layouts that work seamlessly across all devices and screen sizes.",
+                url: "testvideo.html",
+                icon: "💻"
+            },
+            {
+                id: 4,
+                title: "Backend Development Best Practices",
+                description: "Explore REST APIs, database design, and secure authentication systems for production apps.",
+                url: "testvideo.html",
+                icon: "🔧"
+            },
+            {
+                id: 5,
+                title: "Full-Stack Project Walkthrough",
+                description: "Build a complete real-world application from frontend to backend with best practices.",
+                url: "testvideo.html",
+                icon: "🚀"
+            },
+            {
+                id: 6,
+                title: "Deployment, DevOps & Performance",
+                description: "Learn how to deploy applications, manage production environments, and optimize performance.",
+                url: "testvideo.html",
+                icon: "⚡"
+            }
+        ];
+
+        function showDashboard() {
+            renderVideos();
+            updateSubscriptionStatus();
+            setInterval(updateSubscriptionStatus, 60000);
+        }
+
+        function renderVideos() {
+            const list = document.getElementById('videosList');
+            let html = '';
+
+            for (let i = 0; i < videos.length; i++) {
+                const video = videos[i];
+                html += '<div class="video-card" onclick="openModal(' + video.id + ')">';
+                html += '<div class="video-thumbnail">' + video.icon + '</div>';
+                html += '<div class="video-details">';
+                html += '<div class="video-title">' + video.title + '</div>';
+                html += '<div class="video-description">' + video.description + '</div>';
+                html += '<button class="watch-link" onclick="event.stopPropagation(); openModal(' + video.id + ')">Watch Now</button>';
+                html += '</div></div>';
+            }
+
+            list.innerHTML = html;
+        }
+
+        function updateSubscriptionStatus() {
+            // Set default subscription: 30 days active
+            const daysRemaining = 30;
+
+            const badge = document.getElementById('statusBadge');
+            const daysSpan = document.getElementById('daysRemaining');
+
+            badge.className = 'status-badge active';
+            badge.textContent = 'Active';
+            daysSpan.textContent = daysRemaining + ' days left';
+        }
+
+        function openModal(videoId) {
+            let video = null;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].id === videoId) {
+                    video = videos[i];
+                    break;
+                }
+            }
+
+            if (video) {
+                // Redirect to full-page video player
+                window.location.href = video.url;
+            }
+        }
+
+        // Initialize dashboard on page load
+        showDashboard();
+    </script>
+</body>
+
+</html>
