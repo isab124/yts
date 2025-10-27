@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d0d0d;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Anti-screenshot watermark overlay */
+        body::before {
+            content: 'PROTECTED CONTENT';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px;
+            color: rgba(255, 0, 0, 0.05);
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #e0e7ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: rgba(99, 102, 241, 0.6);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .pdf-container {
+            width: 100%;
+            height: 100vh;
+            background: #1a1a1a;
+        }
+
+        #pdfFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Transparent overlay to capture all mouse clicks */
+        .selection-blocker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            pointer-events: auto;
+            background: transparent;
+        }
+
+        /* Overlay to hide PDF toolbar buttons */
+        .button-blocker {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 60px;
+            background: white;
+            z-index: 1000;
+            pointer-events: auto;
+        }
+
+        /* Hide bottom toolbar */
+        .bottom-blocker {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(to top, white, transparent);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .button-blocker {
+                width: 150px;
+                height: 50px;
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            .back-button span:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="youtube_subscription_site.html" class="back-button">
+        <span>←</span>
+        <span>Back to Content</span>
+    </a>
+
+    <div class="pdf-container">
+        <iframe id="pdfFrame"></iframe>
+        <div class="selection-blocker"></div>
+        <div class="button-blocker"></div>
+        <div class="bottom-blocker"></div>
+    </div>
+
+    <script>
+        // PDF URL Configuration
+        const pdfUrls = {
+            'sample': 'https://pdfobject.com/pdf/sample.pdf',
+            'sample2': 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+            'drive1': 'https://drive.google.com/file/d/1GSP5zL_FDLhXJdG1TtMqzraSpYyNjJ62/preview?embedded=true'
+        };
+
+        // Get PDF URL from parameter or use default
+        function getPdfUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pdfId = urlParams.get('id') || 'sample';
+
+            // If ID exists in config, use it
+            if (pdfUrls[pdfId]) {
+                return pdfUrls[pdfId];
+            }
+
+            // Otherwise treat it as a direct URL (base64 encoded)
+            const directUrl = urlParams.get('url');
+            if (directUrl) {
+                try {
+                    return atob(directUrl);
+                } catch (e) {
+                    console.error('Invalid URL parameter');
+                }
+            }
+
+            // Default fallback
+            return pdfUrls['sample'];
+        }
+
+        // Load PDF
+        window.addEventListener('load', function () {
+            const iframe = document.getElementById('pdfFrame');
+            const pdfUrl = getPdfUrl();
+            currentPdfUrl = pdfUrl;
+
+            console.log('Loading PDF:', pdfUrl);
+            iframe.src = pdfUrl;
+
+            iframe.onload = function () {
+                console.log('PDF loaded successfully');
+
+                // Try to inject CSS to hide buttons and disable selection (works for same-origin PDFs)
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc) {
+                        const style = iframeDoc.createElement('style');
+                        style.textContent = `
+                            /* Hide download and share buttons */
+                            button[title*="Download"],
+                            button[title*="Print"],
+                            button[aria-label*="Download"],
+                            button[aria-label*="Print"],
+                            a[download],
+                            .download-button,
+                            .print-button,
+                            #download,
+                            #print {
+                                display: none !important;
+                                visibility: hidden !important;
+                            }
+                            
+                            /* Disable text selection in PDF */
+                            * {
+                                user-select: none !important;
+                                -webkit-user-select: none !important;
+                                -moz-user-select: none !important;
+                                -ms-user-select: none !important;
+                            }
+                        `;
+                        iframeDoc.head.appendChild(style);
+
+                        // Block selection events inside iframe
+                        iframeDoc.addEventListener('selectstart', e => e.preventDefault());
+                        iframeDoc.addEventListener('mousedown', e => {
+                            if (e.detail > 1) e.preventDefault(); // Prevent double/triple click selection
+                        });
+
+                        console.log('Injected CSS and selection blocking');
+                    }
+                } catch (e) {
+                    console.log('CORS blocked, using overlay instead');
+                }
+            };
+
+            iframe.onerror = function () {
+                console.error('Failed to load PDF');
+                alert('Failed to load PDF. Please try again.');
+            };
+        });
+
+        // Anti-debugging: Detect DevTools
+        (function () {
+            let detectionCount = 0;
+            setInterval(function () {
+                const threshold = 160;
+                if (window.outerWidth - window.innerWidth > threshold ||
+                    window.outerHeight - window.innerHeight > threshold) {
+                    detectionCount++;
+                    if (detectionCount >= 2) {
+                        console.warn('DevTools detected - Redirecting');
+                        window.location.href = 'youtube_subscription_site.html';
+                    }
+                } else {
+                    detectionCount = Math.max(0, detectionCount - 1);
+                }
+            }, 500);
+        })();
+
+        // Debugger detection
+        (function () {
+            let checkCount = 0;
+            setInterval(function () {
+                const before = new Date();
+
+                const after = new Date();
+                if (after - before > 100) {
+                    checkCount++;
+                    if (checkCount >= 2) {
+                        window.location.href = 'youtube_subscription_site.html';
+                    }
+                } else {
+                    checkCount = 0;
+                }
+            }, 1000);
+        })();
+
+
+
+        // Block ALL keys except Arrow Up and Arrow Down
+        let iframeRemoved = false;
+
+        document.addEventListener('keydown', e => {
+            // Allow only Arrow Up (38) and Arrow Down (40)
+            if (e.keyCode !== 38 && e.keyCode !== 40) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Check if this is a threatening key
+                const isThreat = e.keyCode === 44 || // PrtScn
+                    e.keyCode === 91 || e.keyCode === 92 || // Win keys
+                    e.keyCode === 123 || // F12
+                    (e.ctrlKey && e.shiftKey) ||
+                    (e.metaKey) || // Any Windows key combo
+                    (e.ctrlKey && (e.keyCode === 80 || e.keyCode === 83 || e.keyCode === 85));
+
+                if (isThreat && !iframeRemoved) {
+                    // Remove iframe from DOM permanently
+                    const iframe = document.getElementById('pdfFrame');
+                    if (iframe) {
+                        iframe.remove();
+                        iframeRemoved = true;
+                        document.body.style.background = '#000';
+                    }
+                }
+                return false;
+            }
+        });
+
+        // Detect Print Screen release
+        document.addEventListener('keyup', e => {
+            if (e.keyCode === 44) {
+                navigator.clipboard.writeText('').catch(() => { });
+                document.body.style.opacity = '0';
+                setTimeout(() => { document.body.style.opacity = '1'; }, 200);
+            }
+        });
+
+        // Detect screen recording (visibility changes)
+        let suspiciousCount = 0;
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                suspiciousCount++;
+                if (suspiciousCount > 5) {
+                    alert('⚠️ Suspicious activity detected!\n\nMultiple screen capture attempts logged.');
+                    window.location.href = 'youtube_subscription_site.html';
+                }
+            }
+        });
+
+        // Detect window blur (screenshot tools)
+        let blurCount = 0;
+        window.addEventListener('blur', function () {
+            blurCount++;
+            if (blurCount > 10) {
+                alert('⚠️ Screen capture tools detected!');
+                window.location.href = 'youtube_subscription_site.html';
+            }
+        });
+
+        // Prevent text selection and copying
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('copy', e => {
+            e.preventDefault();
+            alert('Copying is disabled');
+            return false;
+        });
+        document.addEventListener('cut', e => e.preventDefault());
+        document.addEventListener('paste', e => e.preventDefault());
+
+        // Detect Screen Capture API usage
+        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+            const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+            navigator.mediaDevices.getDisplayMedia = function () {
+                // alert('⚠️ SCREEN RECORDING BLOCKED!\n\nThis action has been logged.');
+                document.body.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.style.opacity = '1';
+                    window.location.href = 'youtube_subscription_site.html';
+                }, 500);
+                return Promise.reject(new Error('Screen capture blocked'));
+            };
+        }
+
+        // Monitor for external screenshot tools via focus loss patterns
+        let rapidBlurCount = 0;
+        let lastBlurTime = 0;
+        window.addEventListener('blur', function () {
+            const now = Date.now();
+            if (now - lastBlurTime < 1000) {
+                rapidBlurCount++;
+                if (rapidBlurCount > 3) {
+                    document.body.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.style.opacity = '1';
+                        // alert('⚠️ Screenshot tool detected!\n\nAccess logged.');
+                    }, 300);
+                    rapidBlurCount = 0;
+                }
+            } else {
+                rapidBlurCount = 0;
+            }
+            lastBlurTime = now;
+        });
+
+        // Periodic content scrambling to prevent long-duration recordings
+        let scrambleInterval = setInterval(() => {
+            const iframe = document.getElementById('pdfFrame');
+            if (iframe && document.hidden) {
+                // If page is hidden (potential recording), scramble content
+                iframe.style.filter = 'blur(50px)';
+                setTimeout(() => {
+                    iframe.style.filter = 'none';
+                }, 100);
+            }
+        }, 5000);
+
+        // Detect if page is being captured (experimental)
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                const iframe = document.getElementById('pdfFrame');
+                if (iframe) {
+                    iframe.style.opacity = '0';
+                }
+            } else {
+                const iframe = document.getElementById('pdfFrame');
+                if (iframe) {
+                    iframe.style.opacity = '1';
+                }
+            }
+        });
+
+        // Block drag and drop
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('drop', e => e.preventDefault());
+
+        // Detect ANY mouse click (left, right, middle) and permanently remove iframe
+        function removeIframeOnClick(e) {
+            const iframe = document.getElementById('pdfFrame');
+            if (iframe && !iframeRemoved) {
+                iframe.remove();
+                iframeRemoved = true;
+                document.body.style.background = '#000';
+            }
+        }
+
+        // Capture all mouse events on document
+        document.addEventListener('mousedown', removeIframeOnClick, true);
+        document.addEventListener('click', removeIframeOnClick, true);
+        document.addEventListener('contextmenu', function (e) {
+            removeIframeOnClick(e);
+            e.preventDefault();
+            return false;
+        }, true);
+
+        // Add click handler to the overlay blocker
+        window.addEventListener('load', function () {
+            const blocker = document.querySelector('.selection-blocker');
+            if (blocker) {
+                blocker.addEventListener('mousedown', removeIframeOnClick);
+                blocker.addEventListener('click', removeIframeOnClick);
+                blocker.addEventListener('contextmenu', function (e) {
+                    removeIframeOnClick(e);
+                    e.preventDefault();
+                    return false;
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

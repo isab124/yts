@@ -316,6 +316,184 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .content-area {
+            min-width: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 4px;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            margin: 8px 0;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(15, 23, 42, 0.6);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #7c3aed 0%, #a78bfa 50%, #c4b5fd 100%);
+            border: 2px solid rgba(15, 23, 42, 0.4);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            transform: scaleX(1.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(180deg, #8b5cf6 0%, #a78bfa 50%, #ddd6fe 100%);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+        }
+
+        /* Firefox Scrollbar */
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: #6366f1 rgba(15, 23, 42, 0.6);
+        }
+
+        .sidebar-title-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .sidebar-icon {
+            font-size: 24px;
+        }
+
+        .sidebar-main-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .announcement-box {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .announcement-box:hover {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+            transform: translateX(0px);
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .announcement-icon {
+            font-size: 24px;
+        }
+
+        .announcement-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e0e7ff;
+            flex: 1;
+        }
+
+        .announcement-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .announcement-badge.new {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .announcement-badge.alert {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .announcement-badge.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .announcement-content {
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .announcement-date {
+            color: #94a3b8;
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .announcement-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .announcement-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
         }
 
         .playlist-header {
@@ -628,6 +806,32 @@
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%);
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+                max-height: 500px;
+                order: -1;
+            }
+
+            .sidebar-title-box {
+                padding: 12px;
+                margin-bottom: 16px;
+            }
+
+            .sidebar-icon {
+                font-size: 20px;
+            }
+
+            .sidebar-main-title {
+                font-size: 16px;
+            }
+        }
+
         @media (max-width: 768px) {
             .video-card {
                 padding: 20px;
@@ -637,6 +841,19 @@
             .videos-grid {
                 gap: 16px;
                 padding: 20px;
+            }
+
+            .announcement-box {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .announcement-title {
+                font-size: 14px;
+            }
+
+            .announcement-content {
+                font-size: 13px;
             }
 
             .video-thumbnail {
@@ -790,12 +1007,87 @@
         </div>
 
         <div class="main-content">
-            <div class="playlist-header">
-                <div class="playlist-title">Exclusive Tutorials & Guides</div>
-                <div class="playlist-stats" id="playlistStats">6 videos</div>
+            <div class="content-area">
+                <div class="playlist-header">
+                    <div class="playlist-title">Exclusive Tutorials & Guides</div>
+                    <div class="playlist-stats" id="playlistStats">6 videos</div>
+                </div>
+
+                <div class="videos-grid" id="videosList">
+                </div>
             </div>
 
-            <div class="videos-grid" id="videosList">
+            <div class="sidebar">
+                <div class="sidebar-title-box">
+                    <span class="sidebar-icon">📢</span>
+                    <span class="sidebar-main-title">Announcements</span>
+                </div>
+
+                <div class="announcement-box">
+                    <div class="announcement-header">
+                        <span class="announcement-icon">📢</span>
+                        <span class="announcement-title">New Content Alert!</span>
+                        <span class="announcement-badge new">New</span>
+                    </div>
+                    <div class="announcement-content">
+                        We just added 3 new advanced JavaScript tutorials and a complete project source code repository.
+                        Check them out now!
+                    </div>
+                    <div class="announcement-date">Posted 2 hours ago</div>
+                </div>
+
+                <div class="announcement-box">
+                    <div class="announcement-header">
+                        <span class="announcement-icon">🎉</span>
+                        <span class="announcement-title">Live Q&A Session</span>
+                        <span class="announcement-badge info">Info</span>
+                    </div>
+                    <div class="announcement-content">
+                        Join us this Friday at 7 PM EST for a live Q&A session. Ask anything about web development,
+                        career advice, or project help!
+                    </div>
+                    <a href="https://discord.gg/YOUR_INVITE" class="announcement-link" target="_blank">Join Discord</a>
+                    <div class="announcement-date">Scheduled for Dec 15, 2024</div>
+                </div>
+
+                <div class="announcement-box">
+                    <div class="announcement-header">
+                        <span class="announcement-icon">⚠️</span>
+                        <span class="announcement-title">Important Update</span>
+                        <span class="announcement-badge alert">Alert</span>
+                    </div>
+                    <div class="announcement-content">
+                        We're upgrading our servers this weekend. Some content might be temporarily unavailable on
+                        Saturday between 2-4 AM EST.
+                    </div>
+                    <div class="announcement-date">Dec 10, 2024</div>
+                </div>
+
+                <div class="announcement-box">
+                    <div class="announcement-header">
+                        <span class="announcement-icon">💡</span>
+                        <span class="announcement-title">Pro Tip</span>
+                        <span class="announcement-badge info">Tip</span>
+                    </div>
+                    <div class="announcement-content">
+                        Download the PDFs for offline access! Perfect for studying on the go or when you don't have
+                        internet connection.
+                    </div>
+                    <div class="announcement-date">Dec 5, 2024</div>
+                </div>
+
+                <div class="announcement-box">
+                    <div class="announcement-header">
+                        <span class="announcement-icon">🎁</span>
+                        <span class="announcement-title">Exclusive Bonus</span>
+                        <span class="announcement-badge new">New</span>
+                    </div>
+                    <div class="announcement-content">
+                        As a thank you to our subscribers, we're giving away premium design assets worth $200. Check
+                        your email for the download link!
+                    </div>
+                    <div class="announcement-date">Dec 1, 2024</div>
+                </div>
             </div>
         </div>
     </div>
@@ -827,41 +1119,71 @@
                 title: "Getting Started with Web Development",
                 description: "Learn the fundamentals of HTML, CSS, and JavaScript in this comprehensive tutorial for beginners.",
                 url: "testvideo.html",
+                type: "video",
                 icon: "🎬"
             },
             {
                 id: 2,
-                title: "Advanced JavaScript Techniques & Patterns",
-                description: "Master async/await, closures, and functional programming patterns to write better code.",
-                url: "testvideo.html",
-                icon: "📝"
+                title: "Complete JavaScript Cheat Sheet (PDF)",
+                description: "Downloadable PDF with all JavaScript syntax, methods, and best practices in one place.",
+                url: "pdfviewer.html?id=sample",
+                type: "pdf",
+                icon: "📄"
             },
             {
                 id: 3,
-                title: "Building Responsive Websites",
-                description: "Create beautiful and responsive layouts that work seamlessly across all devices and screen sizes.",
+                title: "Advanced JavaScript Techniques & Patterns",
+                description: "Master async/await, closures, and functional programming patterns to write better code.",
                 url: "testvideo.html",
-                icon: "💻"
+                type: "video",
+                icon: "📝"
             },
             {
                 id: 4,
-                title: "Backend Development Best Practices",
-                description: "Explore REST APIs, database design, and secure authentication systems for production apps.",
+                title: "Building Responsive Websites",
+                description: "Create beautiful and responsive layouts that work seamlessly across all devices and screen sizes.",
                 url: "testvideo.html",
-                icon: "🔧"
+                type: "video",
+                icon: "💻"
             },
             {
                 id: 5,
-                title: "Full-Stack Project Walkthrough",
-                description: "Build a complete real-world application from frontend to backend with best practices.",
-                url: "testvideo.html",
-                icon: "🚀"
+                title: "Web Development Roadmap 2025 (PDF)",
+                description: "Complete learning path with resources, timelines, and career guidance for web developers.",
+                url: "pdfviewer.html?id=sample2",
+                type: "pdf",
+                icon: "🗺️"
             },
             {
                 id: 6,
+                title: "Backend Development Best Practices",
+                description: "Explore REST APIs, database design, and secure authentication systems for production apps.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "🔧"
+            },
+            {
+                id: 7,
+                title: "Full-Stack Project Walkthrough",
+                description: "Build a complete real-world application from frontend to backend with best practices.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "🚀"
+            },
+            {
+                id: 8,
+                title: "Interview Questions & Answers (PDF)",
+                description: "200+ common interview questions with detailed answers for frontend and backend roles.",
+                url: "pdfviewer.html?id=drive1",
+                type: "pdf",
+                icon: "📋"
+            },
+            {
+                id: 9,
                 title: "Deployment, DevOps & Performance",
                 description: "Learn how to deploy applications, manage production environments, and optimize performance.",
                 url: "testvideo.html",
+                type: "video",
                 icon: "⚡"
             }
         ];
@@ -869,8 +1191,37 @@
         function showDashboard() {
             renderVideos();
             updateSubscriptionStatus();
+            updateContentStats();
             setInterval(updateSubscriptionStatus, 60000);
         }
+
+        // To add/update announcements, simply edit the HTML in the sidebar section above
+        // Or use this function to dynamically add announcements:
+        function addAnnouncement(icon, title, badge, badgeType, content, date, link) {
+            const sidebar = document.querySelector('.sidebar');
+            const announcement = document.createElement('div');
+            announcement.className = 'announcement-box';
+
+            let linkHtml = '';
+            if (link) {
+                linkHtml = '<a href="' + link.url + '" class="announcement-link" target="_blank">' + link.text + '</a>';
+            }
+
+            announcement.innerHTML =
+                '<div class="announcement-header">' +
+                '<span class="announcement-icon">' + icon + '</span>' +
+                '<span class="announcement-title">' + title + '</span>' +
+                '<span class="announcement-badge ' + badgeType + '">' + badge + '</span>' +
+                '</div>' +
+                '<div class="announcement-content">' + content + '</div>' +
+                linkHtml +
+                '<div class="announcement-date">' + date + '</div>';
+
+            sidebar.insertBefore(announcement, sidebar.firstChild);
+        }
+
+        // Example: Add a new announcement programmatically
+        // addAnnouncement('🚀', 'New Feature', 'New', 'new', 'We just launched a new feature!', 'Just now', {url: '#', text: 'Learn More'});
 
         function renderVideos() {
             const list = document.getElementById('videosList');
@@ -883,7 +1234,7 @@
                 html += '<div class="video-details">';
                 html += '<div class="video-title">' + video.title + '</div>';
                 html += '<div class="video-description">' + video.description + '</div>';
-                html += '<button class="watch-link" onclick="event.stopPropagation(); openModal(' + video.id + ')">Watch Now</button>';
+                html += '<button class="watch-link" onclick="event.stopPropagation(); openModal(' + video.id + ')">' + (video.type == 'pdf' ? 'View Pdf' : 'Watch Now') + '</button>';
                 html += '</div></div>';
             }
 
@@ -912,8 +1263,14 @@
             }
 
             if (video) {
-                // Redirect to full-page video player
-                window.location.href = video.url;
+                // Handle different content types
+                if (video.type === 'video' || video.type === 'pdf') {
+                    // Redirect to full-page viewer
+                    window.location.href = video.url;
+                } else {
+                    // Open external links in new tab
+                    window.open(video.url, '_blank');
+                }
             }
         }
 
