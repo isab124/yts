@@ -83,7 +83,7 @@
             -ms-user-select: none;
         }
 
-        /* Transparent overlay to capture all mouse clicks */
+        /* Transparent overlay - disabled to allow scrolling */
         .selection-blocker {
             position: fixed;
             top: 0;
@@ -91,8 +91,9 @@
             width: 100%;
             height: 100%;
             z-index: 10000;
-            pointer-events: auto;
+            pointer-events: none;
             background: transparent;
+            display: none;
         }
 
         /* Overlay to hide PDF toolbar buttons */
@@ -156,6 +157,14 @@
     </div>
 
     <script>
+        document.addEventListener('contextmenu', e => e.preventDefault()); // Disable right-click
+document.addEventListener('mousedown', e => {
+    // Disable middle and right clicks
+    if (e.button === 1 || e.button === 2) e.preventDefault();
+});
+
+// Optional: block double-click zoom or selection
+document.addEventListener('dblclick', e => e.preventDefault());
         // PDF URL Configuration
         const pdfUrls = {
             'sample': 'https://pdfobject.com/pdf/sample.pdf',
@@ -423,38 +432,31 @@
         document.addEventListener('dragstart', e => e.preventDefault());
         document.addEventListener('drop', e => e.preventDefault());
 
-        // Detect ANY mouse click (left, right, middle) and permanently remove iframe
-        function removeIframeOnClick(e) {
-            const iframe = document.getElementById('pdfFrame');
-            if (iframe && !iframeRemoved) {
-                iframe.remove();
-                iframeRemoved = true;
-                document.body.style.background = '#000';
-            }
-        }
+        // Block all mouse buttons except scroll wheel
+        document.addEventListener('mousedown', function(e) {
+            // Allow only back button clicks
+            if (e.target.closest('.back-button')) return;
+            
+            // Block all mouse buttons (left=0, middle=1, right=2)
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, true);
 
-        // Capture all mouse events on document
-        document.addEventListener('mousedown', removeIframeOnClick, true);
-        document.addEventListener('click', removeIframeOnClick, true);
-        document.addEventListener('contextmenu', function (e) {
-            removeIframeOnClick(e);
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.back-button')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, true);
+
+        document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         }, true);
 
-        // Add click handler to the overlay blocker
-        window.addEventListener('load', function () {
-            const blocker = document.querySelector('.selection-blocker');
-            if (blocker) {
-                blocker.addEventListener('mousedown', removeIframeOnClick);
-                blocker.addEventListener('click', removeIframeOnClick);
-                blocker.addEventListener('contextmenu', function (e) {
-                    removeIframeOnClick(e);
-                    e.preventDefault();
-                    return false;
-                });
-            }
-        });
+        // No overlay blocking - wheel scrolling works naturally
+        // Mouse button clicks are blocked by document-level listeners above
     </script>
 </body>
 
