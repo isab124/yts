@@ -639,6 +639,21 @@
             display: inline-block;
             padding: 8px 16px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            width: fit-content;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .watch-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
         }
@@ -1088,133 +1103,181 @@
                 <div class="video-player-container" id="videoPlayerContainer"></div>
             </div>
             <p class="modal-description" id="modalDescription"></p>
-            url: "testvideo.html",
-            type: "video",
-            icon: "🎬"
-            },
-            {
-            id: 2,
-            title: "Complete JavaScript Cheat Sheet (PDF)",
-            description: "Downloadable PDF with all JavaScript syntax, methods, and best practices in one place.",
-            url: "pdfviewer.html?id=sample",
-            type: "pdf",
-            icon: "📄"
-            },
-            {
-            id: 3,
-            title: "Advanced JavaScript Techniques & Patterns",
-            description: "Master async/await, closures, and functional programming patterns to write better code.",
-            url: "testvideo.html",
-            type: "video",
-            icon: "📝"
-            },
-            {
-            id: 4,
-            title: "Building Responsive Websites",
-            description: "Create beautiful and responsive layouts that work seamlessly across all devices and screen
-            sizes.",
-            url: "testvideo.html",
-            type: "video",
-            icon: "💻"
-            },
-            {
-            id: 5,
-            title: "Web Development Roadmap 2025 (PDF)",
-            description: "Complete learning path with resources, timelines, and career guidance for web developers.",
-            url: "pdfviewer.html?id=sample2",
-            type: "pdf",
-            icon: "🗺️"
-            },
-            {
-            id: 6,
-            title: "Backend Development Best Practices",
-            description: "Explore REST APIs, database design, and secure authentication systems for production apps.",
-            url: "testvideo.html",
-            type: "video",
-            icon: "🔧"
-            },
-            {
-            id: 7,
-            title: "Full-Stack Project Walkthrough",
-            description: "Build a complete real-world application from frontend to backend with best practices.",
-            url: "testvideo.html",
-            type: "video",
-            icon: "🚀"
-            },
-            {
-            id: 8,
-            title: "Interview Questions & Answers (PDF)",
-            description: "200+ common interview questions with detailed answers for frontend and backend roles.",
-            url: "pdfviewer.html?id=drive1",
-            type: "pdf",
-            icon: "📋"
-            },
-            {
-            id: 9,
-            title: "Deployment, DevOps & Performance",
-            description: "Learn how to deploy applications, manage production environments, and optimize performance.",
-            url: "testvideo.html",
-            type: "video",
-            icon: "⚡"
-            }
-            ];
+        </div>
+    </div>
 
-            function showDashboard() {
+    <script>
+
+        // Check if user is authorized
+        if (localStorage.getItem('userAuthorized') !== 'true') {
+            // Redirect to email prompt if not authorized
+            window.location.href = 'index.html';
+        }
+
+        const videos = [
+            {
+                id: 1,
+                title: "Getting Started with Web Development",
+                description: "Learn the fundamentals of HTML, CSS, and JavaScript in this comprehensive tutorial for beginners.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "🎬"
+            },
+            {
+                id: 2,
+                title: "Complete JavaScript Cheat Sheet (PDF)",
+                description: "Downloadable PDF with all JavaScript syntax, methods, and best practices in one place.",
+                url: "pdfviewer.html?id=sample",
+                type: "pdf",
+                icon: "📄"
+            },
+            {
+                id: 3,
+                title: "Advanced JavaScript Techniques & Patterns",
+                description: "Master async/await, closures, and functional programming patterns to write better code.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "📝"
+            },
+            {
+                id: 4,
+                title: "Building Responsive Websites",
+                description: "Create beautiful and responsive layouts that work seamlessly across all devices and screen sizes.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "💻"
+            },
+            {
+                id: 5,
+                title: "Web Development Roadmap 2025 (PDF)",
+                description: "Complete learning path with resources, timelines, and career guidance for web developers.",
+                url: "pdfviewer.html?id=sample2",
+                type: "pdf",
+                icon: "🗺️"
+            },
+            {
+                id: 6,
+                title: "Backend Development Best Practices",
+                description: "Explore REST APIs, database design, and secure authentication systems for production apps.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "🔧"
+            },
+            {
+                id: 7,
+                title: "Full-Stack Project Walkthrough",
+                description: "Build a complete real-world application from frontend to backend with best practices.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "🚀"
+            },
+            {
+                id: 8,
+                title: "Interview Questions & Answers (PDF)",
+                description: "200+ common interview questions with detailed answers for frontend and backend roles.",
+                url: "pdfviewer.html?id=drive1",
+                type: "pdf",
+                icon: "📋"
+            },
+            {
+                id: 9,
+                title: "Deployment, DevOps & Performance",
+                description: "Learn how to deploy applications, manage production environments, and optimize performance.",
+                url: "testvideo.html",
+                type: "video",
+                icon: "⚡"
+            }
+        ];
+
+        function showDashboard() {
             renderVideos();
             updateSubscriptionStatus();
             updateContentStats();
             setInterval(updateSubscriptionStatus, 60000);
-            }
+        }
 
-            // To add/update announcements, simply edit the HTML in the sidebar section above
-            // Or use this function to dynamically add announcements:
-            function addAnnouncement(icon, title, badge, badgeType, content, date, link) {
+        // To add/update announcements, simply edit the HTML in the sidebar section above
+        // Or use this function to dynamically add announcements:
+        function addAnnouncement(icon, title, badge, badgeType, content, date, link) {
             const sidebar = document.querySelector('.sidebar');
             const announcement = document.createElement('div');
             announcement.className = 'announcement-box';
 
             let linkHtml = '';
             if (link) {
-            linkHtml = '<a href="' + link.url + '" class="announcement-link" target="_blank">' + link.text + '</a>';
+                linkHtml = '<a href="' + link.url + '" class="announcement-link" target="_blank">' + link.text + '</a>';
             }
 
             announcement.innerHTML =
-            '<div class="announcement-header">' +
+                '<div class="announcement-header">' +
                 '<span class="announcement-icon">' + icon + '</span>' +
                 '<span class="announcement-title">' + title + '</span>' +
                 '<span class="announcement-badge ' + badgeType + '">' + badge + '</span>' +
                 '</div>' +
-            '<div class="announcement-content">' + content + '</div>' +
-            linkHtml +
-            '<div class="announcement-date">' + date + '</div>';
+                '<div class="announcement-content">' + content + '</div>' +
+                linkHtml +
+                '<div class="announcement-date">' + date + '</div>';
 
             sidebar.insertBefore(announcement, sidebar.firstChild);
-            }
+        }
 
-            // Example: Add a new announcement programmatically
-            // addAnnouncement('🚀', 'New Feature', 'New', 'new', 'We just launched a new feature!', 'Just now', {url:
-            '#', text: 'Learn More'});
+        // Example: Add a new announcement programmatically
+        // addAnnouncement('🚀', 'New Feature', 'New', 'new', 'We just launched a new feature!', 'Just now', {url: '#', text: 'Learn More'});
 
-            function renderVideos() {
+        function renderVideos() {
             const list = document.getElementById('videosList');
             let html = '';
 
-            for (let i = 0; i < videos.length; i++) { const video=videos[i]; html
-                +='<div class="video-card" onclick="openModal(' + video.id + ')">' ; html
-                +='<div class="video-thumbnail">' + video.icon + '</div>' ; html +='<div class="video-details">' ; html
-                +='<div class="video-title">' + video.title + '</div>' ; html +='<div class="video-description">' +
-                video.description + '</div>' ; html
-                +='<button class="watch-link" onclick="event.stopPropagation(); openModal(' + video.id + ')">' +
-                (video.type=='pdf' ? 'View Pdf' : 'Watch Now' ) + '</button>' ; html +='</div></div>' ; }
-                list.innerHTML=html; } function updateSubscriptionStatus() { // Set default subscription: 30 days active
-                const daysRemaining=30; const badge=document.getElementById('statusBadge'); const
-                daysSpan=document.getElementById('daysRemaining'); badge.className='status-badge active' ;
-                badge.textContent='Active' ; daysSpan.textContent=daysRemaining + ' days left' ; } function
-                openModal(videoId) { let video=null; for (let i=0; i < videos.length; i++) { if (videos[i].id===videoId)
-                { video=videos[i]; break; } } if (video) { // Handle different content types if (video.type==='video' ||
-                video.type==='pdf' ) { // Redirect to full-page viewer window.location.href=video.url; } else { // Open
-                external links in new tab window.open(video.url, '_blank' ); } } } // Initialize dashboard on page load
-                showDashboard(); </script>
+            for (let i = 0; i < videos.length; i++) {
+                const video = videos[i];
+                html += '<div class="video-card" onclick="openModal(' + video.id + ')">';
+                html += '<div class="video-thumbnail">' + video.icon + '</div>';
+                html += '<div class="video-details">';
+                html += '<div class="video-title">' + video.title + '</div>';
+                html += '<div class="video-description">' + video.description + '</div>';
+                html += '<button class="watch-link" onclick="event.stopPropagation(); openModal(' + video.id + ')">' + (video.type == 'pdf' ? 'View Pdf' : 'Watch Now') + '</button>';
+                html += '</div></div>';
+            }
+
+            list.innerHTML = html;
+        }
+
+        function updateSubscriptionStatus() {
+            // Set default subscription: 30 days active
+            const daysRemaining = 30;
+
+            const badge = document.getElementById('statusBadge');
+            const daysSpan = document.getElementById('daysRemaining');
+
+            badge.className = 'status-badge active';
+            badge.textContent = 'Active';
+            daysSpan.textContent = daysRemaining + ' days left';
+        }
+
+        function openModal(videoId) {
+            let video = null;
+            for (let i = 0; i < videos.length; i++) {
+                if (videos[i].id === videoId) {
+                    video = videos[i];
+                    break;
+                }
+            }
+
+            if (video) {
+                // Handle different content types
+                if (video.type === 'video' || video.type === 'pdf') {
+                    // Redirect to full-page viewer
+                    window.location.href = video.url;
+                } else {
+                    // Open external links in new tab
+                    window.open(video.url, '_blank');
+                }
+            }
+        }
+
+        // Initialize dashboard on page load
+        showDashboard();
+    </script>
 </body>
 
 </html>
