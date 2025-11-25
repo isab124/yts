@@ -83,7 +83,8 @@
             -ms-user-select: none;
         }
 
-        /* Transparent overlay to capture all mouse clicks */
+        /* Overlay blocks clicks but NOT wheel - impossible with CSS alone */
+        /* So we use JS to manually forward wheel events */
         .selection-blocker {
             position: fixed;
             top: 0;
@@ -156,6 +157,14 @@
     </div>
 
     <script>
+        document.addEventListener('contextmenu', e => e.preventDefault()); // Disable right-click
+        document.addEventListener('mousedown', e => {
+            // Disable middle and right clicks
+            if (e.button === 1 || e.button === 2) e.preventDefault();
+        });
+
+        // Optional: block double-click zoom or selection
+        document.addEventListener('dblclick', e => e.preventDefault());
         // PDF URL Configuration
         const pdfUrls = {
             'sample': 'https://pdfobject.com/pdf/sample.pdf',
@@ -423,36 +432,88 @@
         document.addEventListener('dragstart', e => e.preventDefault());
         document.addEventListener('drop', e => e.preventDefault());
 
-        // Detect ANY mouse click (left, right, middle) and permanently remove iframe
-        function removeIframeOnClick(e) {
-            const iframe = document.getElementById('pdfFrame');
-            if (iframe && !iframeRemoved) {
-                iframe.remove();
-                iframeRemoved = true;
-                document.body.style.background = '#000';
-            }
-        }
+        // Remove iframe on left or right mouse button click
+        document.addEventListener('mousedown', function (e) {
+            // Allow only back button clicks
+            if (e.target.closest('.back-button')) return;
 
-        // Capture all mouse events on document
-        document.addEventListener('mousedown', removeIframeOnClick, true);
-        document.addEventListener('click', removeIframeOnClick, true);
+            // Remove iframe on left (0) or right (2) button click
+            if (e.button === 0 || e.button === 2) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const iframe = document.getElementById('pdfFrame');
+                if (iframe && !iframeRemoved) {
+                    iframe.remove();
+                    iframeRemoved = true;
+                    document.body.style.background = '#000';
+                }
+                return false;
+            }
+        }, true);
+
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.back-button')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, true);
+
         document.addEventListener('contextmenu', function (e) {
-            removeIframeOnClick(e);
             e.preventDefault();
             return false;
         }, true);
 
-        // Add click handler to the overlay blocker
+        // Overlay captures clicks and forwards wheel to iframe
         window.addEventListener('load', function () {
             const blocker = document.querySelector('.selection-blocker');
-            if (blocker) {
-                blocker.addEventListener('mousedown', removeIframeOnClick);
-                blocker.addEventListener('click', removeIframeOnClick);
+            const iframe = document.getElementById('pdfFrame');
+
+            if (blocker && iframe) {
+                // Remove iframe on left or right click
+                blocker.addEventListener('mousedown', function (e) {
+                    if (e.button === 0 || e.button === 2) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (!iframeRemoved) {
+                            iframe.remove();
+                            iframeRemoved = true;
+                            document.body.style.background = '#000';
+                        }
+                    }
+                });
+
+                blocker.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+
                 blocker.addEventListener('contextmenu', function (e) {
-                    removeIframeOnClick(e);
                     e.preventDefault();
                     return false;
                 });
+
+                // Manually forward wheel events to iframe
+                blocker.addEventListener('wheel', function (e) {
+                    if (iframe && !iframeRemoved) {
+                        // Simulate wheel scroll on iframe
+                        try {
+                            const iframeWin = iframe.contentWindow;
+                            if (iframeWin) {
+                                // Scroll the iframe window
+                                iframeWin.scrollBy({
+                                    top: e.deltaY,
+                                    left: e.deltaX,
+                                    behavior: 'auto'
+                                });
+                            }
+                        } catch (err) {
+                            // CORS - can't access iframe
+                            console.log('Cannot scroll iframe due to CORS');
+                        }
+                    }
+                }, { passive: true });
             }
         });
     </script>
