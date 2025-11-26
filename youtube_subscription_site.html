@@ -815,7 +815,11 @@
                 position: relative;
                 top: 0;
                 max-height: 500px;
-                order: -1;
+                order: 1;
+            }
+            
+            .content-area {
+                order: 0;
             }
 
             .sidebar-title-box {
@@ -923,6 +927,132 @@
                 font-size: 22px;
                 width: 32px;
                 height: 32px;
+            }
+        }
+
+        /* Bottom Sheet for Mobile Announcements */
+        .bottom-sheet-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bottom-sheet-overlay.active {
+            opacity: 1;
+        }
+
+        .bottom-sheet {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 41, 59, 0.98);
+            backdrop-filter: blur(20px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-bottom: none;
+            z-index: 1000;
+            max-height: 70vh;
+            transform: translateY(calc(100% - 60px));
+            transition: transform 0.3s ease;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .bottom-sheet.expanded {
+            transform: translateY(0);
+        }
+
+        .bottom-sheet-handle {
+            padding: 12px 20px 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bottom-sheet-handle::before {
+            content: '';
+            width: 40px;
+            height: 4px;
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 2px;
+            margin-bottom: 12px;
+        }
+
+        .bottom-sheet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .bottom-sheet-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #e0e7ff;
+        }
+
+        .bottom-sheet-badge {
+            background: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .bottom-sheet-content {
+            padding: 0 20px 20px;
+            max-height: calc(70vh - 60px);
+            overflow-y: auto;
+        }
+
+        .bottom-sheet-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .bottom-sheet-content::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 3px;
+        }
+
+        .bottom-sheet-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 1024px) {
+            .bottom-sheet {
+                display: block;
+            }
+
+            .bottom-sheet-overlay {
+                display: block;
+                pointer-events: none;
+            }
+
+            .bottom-sheet-overlay.active {
+                pointer-events: auto;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding-bottom: 80px;
             }
         }
 
@@ -1088,6 +1218,81 @@
                     </div>
                     <div class="announcement-date">Dec 1, 2024</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet for Mobile Announcements -->
+    <div class="bottom-sheet-overlay" id="bottomSheetOverlay"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="bottom-sheet-handle" id="bottomSheetHandle">
+            <div class="bottom-sheet-header">
+                <div class="bottom-sheet-title">
+                    <span>📢</span>
+                    <span>Announcements</span>
+                </div>
+                <span class="bottom-sheet-badge">5 new</span>
+            </div>
+        </div>
+        <div class="bottom-sheet-content" id="bottomSheetContent">
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">📢</span>
+                    <span class="announcement-title">New Content Alert!</span>
+                    <span class="announcement-badge new">New</span>
+                </div>
+                <div class="announcement-content">
+                    We just added 3 new advanced JavaScript tutorials and a complete project source code repository.
+                </div>
+                <div class="announcement-date">Posted 2 hours ago</div>
+            </div>
+
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">🎉</span>
+                    <span class="announcement-title">Live Q&A Session</span>
+                    <span class="announcement-badge info">Info</span>
+                </div>
+                <div class="announcement-content">
+                    Join us this Friday at 7 PM EST for a live Q&A session!
+                </div>
+                <div class="announcement-date">Scheduled for Dec 15, 2024</div>
+            </div>
+
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">⚠️</span>
+                    <span class="announcement-title">Important Update</span>
+                    <span class="announcement-badge alert">Alert</span>
+                </div>
+                <div class="announcement-content">
+                    Server maintenance this weekend. Some content might be temporarily unavailable.
+                </div>
+                <div class="announcement-date">Dec 10, 2024</div>
+            </div>
+
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">💡</span>
+                    <span class="announcement-title">Pro Tip</span>
+                    <span class="announcement-badge info">Tip</span>
+                </div>
+                <div class="announcement-content">
+                    Download the PDFs for offline access! Perfect for studying on the go.
+                </div>
+                <div class="announcement-date">Dec 5, 2024</div>
+            </div>
+
+            <div class="announcement-box">
+                <div class="announcement-header">
+                    <span class="announcement-icon">🎁</span>
+                    <span class="announcement-title">Exclusive Bonus</span>
+                    <span class="announcement-badge new">New</span>
+                </div>
+                <div class="announcement-content">
+                    Premium design assets worth $200 - check your email for the download link!
+                </div>
+                <div class="announcement-date">Dec 1, 2024</div>
             </div>
         </div>
     </div>
@@ -1277,6 +1482,48 @@
 
         // Initialize dashboard on page load
         showDashboard();
+
+        // Bottom Sheet functionality
+        const bottomSheet = document.getElementById('bottomSheet');
+        const bottomSheetOverlay = document.getElementById('bottomSheetOverlay');
+        const bottomSheetHandle = document.getElementById('bottomSheetHandle');
+
+        if (bottomSheet && bottomSheetHandle) {
+            bottomSheetHandle.addEventListener('click', function() {
+                bottomSheet.classList.toggle('expanded');
+                bottomSheetOverlay.classList.toggle('active');
+            });
+
+            bottomSheetOverlay.addEventListener('click', function() {
+                bottomSheet.classList.remove('expanded');
+                bottomSheetOverlay.classList.remove('active');
+            });
+
+            // Touch swipe support
+            let startY = 0;
+            let currentY = 0;
+
+            bottomSheet.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+            });
+
+            bottomSheet.addEventListener('touchmove', function(e) {
+                currentY = e.touches[0].clientY;
+            });
+
+            bottomSheet.addEventListener('touchend', function() {
+                const diff = currentY - startY;
+                if (diff > 50) {
+                    // Swipe down - collapse
+                    bottomSheet.classList.remove('expanded');
+                    bottomSheetOverlay.classList.remove('active');
+                } else if (diff < -50) {
+                    // Swipe up - expand
+                    bottomSheet.classList.add('expanded');
+                    bottomSheetOverlay.classList.add('active');
+                }
+            });
+        }
     </script>
 </body>
 
