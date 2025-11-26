@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +27,7 @@
             background: white;
             padding: 3rem;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 500px;
             width: 100%;
@@ -86,12 +87,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🔐 Access Verification</h1>
         <p>Please enter your credentials to access the video player</p>
         <button class="btn" onclick="showPrompt()">Enter Credentials</button>
-        
+
         <div class="result" id="result">
             <h3>✅ Access Granted!</h3>
             <p id="resultText"></p>
@@ -144,12 +146,12 @@
                 cancelButtonColor: '#d33',
                 preConfirm: () => {
                     const contactValue = document.getElementById('contact').value.trim();
-                    
+
                     if (!contactValue) {
                         Swal.showValidationMessage('Please enter your credentials');
                         return false;
                     }
-                    
+
                     // Check if it contains @ (likely email)
                     if (contactValue.includes('@')) {
                         // Validate as email
@@ -163,25 +165,25 @@
                         // Validate as Indian mobile number
                         // Remove all non-digit characters for validation
                         const digitsOnly = contactValue.replace(/\D/g, '');
-                        
+
                         // Indian mobile number validation
                         // Format: 10 digits starting with 6, 7, 8, or 9
                         // OR with country code: +91 followed by 10 digits
                         const indianMobileRegex = /^[6-9]\d{9}$/; // 10 digits starting with 6-9
                         const indianMobileWithCodeRegex = /^(\+91|91)?[6-9]\d{9}$/; // With optional +91 or 91
-                        
+
                         if (!indianMobileWithCodeRegex.test(digitsOnly)) {
                             Swal.showValidationMessage('Please enter a valid Indian mobile number (10 digits starting with 6, 7, 8, or 9)');
                             return false;
                         }
-                        
+
                         // Check if original input contains valid phone characters
                         const phoneRegex = /^[\d\s\-\+\(\)]+$/;
                         if (!phoneRegex.test(contactValue)) {
                             Swal.showValidationMessage('Phone number can only contain digits, spaces, +, -, ( )');
                             return false;
                         }
-                        
+
                         return { type: 'phone', value: contactValue };
                     }
                 },
@@ -193,7 +195,7 @@
             if (contact) {
                 // Check if credentials are in the allowed list
                 let isAllowed = false;
-                
+
                 if (contact.type === 'email') {
                     isAllowed = allowedCredentials.emails.includes(contact.value.toLowerCase());
                 } else if (contact.type === 'phone') {
@@ -225,7 +227,7 @@
                 }
 
                 const contactType = contact.type === 'email' ? '📧 Email' : '📱 Phone';
-                
+
                 // Show success message
                 await Swal.fire({
                     icon: 'success',
@@ -270,4 +272,5 @@
         // });
     </script>
 </body>
+
 </html>

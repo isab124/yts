@@ -960,11 +960,12 @@
             border-top-right-radius: 24px;
             border: 1px solid rgba(99, 102, 241, 0.3);
             border-bottom: none;
-            z-index: 1000;
+            z-index: 1001;
             max-height: 70vh;
-            transform: translateY(calc(100% - 60px));
+            transform: translateY(calc(100% - 70px));
             transition: transform 0.3s ease;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+            pointer-events: auto;
         }
 
         .bottom-sheet.expanded {
@@ -977,6 +978,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(99, 102, 241, 0.3);
+            user-select: none;
         }
 
         .bottom-sheet-handle::before {
@@ -1447,6 +1451,14 @@
             list.innerHTML = html;
         }
 
+        function updateContentStats() {
+            // Update playlist stats with current video count
+            const playlistStats = document.getElementById('playlistStats');
+            if (playlistStats && videos) {
+                playlistStats.textContent = videos.length + ' videos';
+            }
+        }
+
         function updateSubscriptionStatus() {
             // Set default subscription: 30 days active
             const daysRemaining = 30;
@@ -1484,46 +1496,58 @@
         showDashboard();
 
         // Bottom Sheet functionality
-        const bottomSheet = document.getElementById('bottomSheet');
-        const bottomSheetOverlay = document.getElementById('bottomSheetOverlay');
-        const bottomSheetHandle = document.getElementById('bottomSheetHandle');
+        document.addEventListener('DOMContentLoaded', function() {
+            const bottomSheet = document.getElementById('bottomSheet');
+            const bottomSheetOverlay = document.getElementById('bottomSheetOverlay');
+            const bottomSheetHandle = document.getElementById('bottomSheetHandle');
 
-        if (bottomSheet && bottomSheetHandle) {
-            bottomSheetHandle.addEventListener('click', function() {
-                bottomSheet.classList.toggle('expanded');
-                bottomSheetOverlay.classList.toggle('active');
-            });
+            if (bottomSheet && bottomSheetHandle) {
+                // Click/tap to toggle
+                bottomSheetHandle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    bottomSheet.classList.toggle('expanded');
+                    bottomSheetOverlay.classList.toggle('active');
+                });
 
-            bottomSheetOverlay.addEventListener('click', function() {
-                bottomSheet.classList.remove('expanded');
-                bottomSheetOverlay.classList.remove('active');
-            });
+                // Also add touchend for mobile
+                bottomSheetHandle.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    bottomSheet.classList.toggle('expanded');
+                    bottomSheetOverlay.classList.toggle('active');
+                });
 
-            // Touch swipe support
-            let startY = 0;
-            let currentY = 0;
-
-            bottomSheet.addEventListener('touchstart', function(e) {
-                startY = e.touches[0].clientY;
-            });
-
-            bottomSheet.addEventListener('touchmove', function(e) {
-                currentY = e.touches[0].clientY;
-            });
-
-            bottomSheet.addEventListener('touchend', function() {
-                const diff = currentY - startY;
-                if (diff > 50) {
-                    // Swipe down - collapse
+                bottomSheetOverlay.addEventListener('click', function() {
                     bottomSheet.classList.remove('expanded');
                     bottomSheetOverlay.classList.remove('active');
-                } else if (diff < -50) {
-                    // Swipe up - expand
-                    bottomSheet.classList.add('expanded');
-                    bottomSheetOverlay.classList.add('active');
-                }
-            });
-        }
+                });
+
+                // Touch swipe support on the sheet itself
+                let startY = 0;
+                let currentY = 0;
+
+                bottomSheet.addEventListener('touchstart', function(e) {
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                bottomSheet.addEventListener('touchmove', function(e) {
+                    currentY = e.touches[0].clientY;
+                }, { passive: true });
+
+                bottomSheet.addEventListener('touchend', function() {
+                    const diff = currentY - startY;
+                    if (diff > 50) {
+                        // Swipe down - collapse
+                        bottomSheet.classList.remove('expanded');
+                        bottomSheetOverlay.classList.remove('active');
+                    } else if (diff < -50) {
+                        // Swipe up - expand
+                        bottomSheet.classList.add('expanded');
+                        bottomSheetOverlay.classList.add('active');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 
